@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>COVID-19 Decision Tree Matrix for Title 38 Employees</title>
+    <link rel="icon" href="logo.png">
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">
+    <!-- Bootstrap core CSS -->
+<link href="/docs/4.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <header>
+        <button class="button2" onclick="expandAll()">Expand All</button>
+        <button class="button2" onclick="collapseAll()">Collapse All</button>
+	<button class="button" onclick="window.open('title5.html', '_self');">Title 5</button>
+	<button class="button" onclick="window.open('title38.html', '_self');">Title 38</button>
+	<button class="button" onclick="window.open('title20.html', '_self');">Title 20</button>
+	<button class="button" onclick="window.open('nontitle5.html', '_self');">Non Title 5</button>
+	<button class="button" onclick="window.open('index.html', '_self');">Combination</button>
+	<button class="button2" onclick="myFunction()">EPSLA Definitions</button>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-167862129-1"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'UA-167862129-1');
+	</script>
+    </header>
+
+<script type="text/javascript" src="https://cm-jira.usa.gov/s/d41d8cd98f00b204e9800998ecf8427e-CDN/-r6qoij/803005/b6b48b2829824b869586ac216d119363/2.2.4.7/_/download/batch/com.atlassian.plugins.jquery:jquery/com.atlassian.plugins.jquery:jquery.js?collectorId=6323aa66"></script><script type="text/javascript" src="https://cm-jira.usa.gov/s/86b739f6eaea866c1d0f374d81ad5473-T/-r6qoij/803005/b6b48b2829824b869586ac216d119363/3.0.10/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?locale=en&collectorId=6323aa66"></script>
+
+<script>
+function myFunction() {
+alert("  EPSLA 1 – Employee is subject to a Federal, State, or local quarantine or isolation order related to COVID-19.\n\n  EPSLA 2 – Employee has been advised by a health care provider to self-quarantine due to concerns related to COVID-19.\n\n  EPSLA 3 – Employee is experiencing symptoms of COVID-19 and is seeking a medical diagnosis.\n\n  EPSLA 4 – Employee is caring for an individual who is subject to an order as described in EPLSA 1 or who has been advised as described in EPSLA 2.\n\n  EPSLA 5 – Employee is caring for his or her son or daughter whose school or place of care has been closed or whose child care provider is unavailable due to COVID-19 related reasons.\n\n  EPSLA 6 – Employee is experiencing any other substantially similar condition specified by the Secretary of Health and Human Services in consultation with the Secretary of the Treasury and the Secretary of Labor.");
+}
+</script>
+
+    <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+    <style type="text/css">
+.button {
+  background-color: #008CBA; /* Blue */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+.button2 {
+  background-color: #555555;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+    .node rect {
+        cursor: pointer;
+        fill: #fff;
+        fill-opacity: .5;
+        stroke: darkgrey;
+        stroke-width: 1.5px;
+    }
+
+    .node rect[nodeType=child] {
+        cursor: default;
+    }
+
+    .node text {
+        font: 12px sans-serif;
+        pointer-events: none;
+    }
+
+    path.link {
+        fill: none;
+        stroke: darkgrey;
+        stroke-width: 1.5px;
+    }
+    div.a {
+        font: 18px sans-serif;
+  	font-size: 12px;
+    }    
+    div.b {
+        font: 12px sans-serif;
+  	font-size: 12px;
+	font-style: italic;
+    }    
+   </style>
+</head>
+
+<body>
+  <div class="starter-template">
+    <h1>COVID-19 Decision Tree Matrix</h1>
+    <p class="lead">This tool is intended to guide and facilitate understanding of the FFCRA and CARES Act provisions related to payroll and time and attendance. It is not, and should not be considered a legally authoritative interpretation nor decision. Please consult with your agency, shared service provider or OPM for legal determinations.</p>
+  </div>
+
+    <div id="chart"></div>
+    <script type="text/javascript">
+    var w = 960,
+        h = 10000,
+        i = 0,
+        barHeight = 20,
+        barWidth = w * .85,
+        duration = 400,
+        root;
+
+    var tree = d3.layout.tree()
+        .size([h, 100]);
+
+    var diagonal = d3.svg.diagonal()
+        .projection(function(d) { return [d.y, d.x]; });
+
+    var vis = d3.select("#chart").append("svg:svg")
+        .attr("width", w)
+        .attr("height", h)
+        .append("svg:g")
+        .attr("transform", "translate(20,30)");
+
+    function moveChildren(node) {
+        if (node.children) {
+            node.children.forEach(function(c) { moveChildren(c); });
+            node._children = node.children;
+            node.children = null;
+        }
+    }
+
+var json = 
+{"name": "If I am a(n) Non Title 5 employee, am I eligible for FFCRA COVID-19 leave?", "children": [{
+"name": "and my employment type is Full-Time", "children": [{
+"name": "and I am an NAFI w/Armed Forces", "children": [{
+"name": "and I would like to take Advance Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Annual Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (1, 2, 3)", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the Regular Rate", "children": [{
+"name": "with a daily maximum amount of $511", "children": [{
+"name": "or an aggregate maximum amount of $5,110", "children": [{
+"name": "or an aggregate maximum amount of $5,110"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (4 and 6)", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Regular Rates subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }]},{
+"name": "and I would like to take Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Advance Annual Leave", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }] }]},{
+"name": "and I would like to take EFMLEA which has Daily/Aggregate Dollar Limits and the first 80 hours at no cost to the employer but may be substituted", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Basic Rate subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }] }]},{
+"name": "and I am an USPS", "children": [{
+"name": "and I would like to take Advance Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Annual Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (1, 2, 3)", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the Regular Rate", "children": [{
+"name": "with a daily maximum amount of $511", "children": [{
+"name": "or an aggregate maximum amount of $5,110", "children": [{
+"name": "or an aggregate maximum amount of $5,110"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (4 and 6)", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Regular Rates subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }]},{
+"name": "and I would like to take Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Advance Annual Leave", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }] }]},{
+"name": "and I would like to take EFMLEA which has Daily/Aggregate Dollar Limits and the first 80 hours at no cost to the employer but may be substituted", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Basic Rate subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }] }]},{
+"name": "and I am an Postal Regulatory Commission", "children": [{
+"name": "and I would like to take Advance Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Annual Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (1, 2, 3)", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the Regular Rate", "children": [{
+"name": "with a daily maximum amount of $511", "children": [{
+"name": "or an aggregate maximum amount of $5,110", "children": [{
+"name": "or an aggregate maximum amount of $5,110"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (4 and 6)", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Regular Rates subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }]},{
+"name": "and I would like to take Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Advance Annual Leave", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }] }]},{
+"name": "and I would like to take EFMLEA which has Daily/Aggregate Dollar Limits and the first 80 hours at no cost to the employer but may be substituted", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Basic Rate subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }] }]},{
+"name": "and I am an Legislative Branch", "children": [{
+"name": "and I would like to take Advance Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Annual Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (1, 2, 3)", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the Regular Rate", "children": [{
+"name": "with a daily maximum amount of $511", "children": [{
+"name": "or an aggregate maximum amount of $5,110", "children": [{
+"name": "or an aggregate maximum amount of $5,110"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (4 and 6)", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Regular Rates subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }]},{
+"name": "and I would like to take Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Advance Annual Leave", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }] }]},{
+"name": "and I would like to take EFMLEA which has Daily/Aggregate Dollar Limits and the first 80 hours at no cost to the employer but may be substituted", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Basic Rate subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }] }] }]},{
+"name": "and my employment type is Part-Time or Uncommon Tours of Duty", "children": [{
+"name": "and I am an NAFI w/Armed Forces", "children": [{
+"name": "and I would like to take Advance Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Annual Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (1, 2, 3)", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the Regular Rate", "children": [{
+"name": "with a daily maximum amount of $511", "children": [{
+"name": "or an aggregate maximum amount of $5,110", "children": [{
+"name": "or an aggregate maximum amount of $5,110"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (4 and 6)", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Regular Rates subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }]},{
+"name": "and I would like to take Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Advance Annual Leave", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }] }]},{
+"name": "and I would like to take EFMLEA which has Daily/Aggregate Dollar Limits and the first 80 hours at no cost to the employer but may be substituted", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Basic Rate subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }] }]},{
+"name": "and I am an USPS", "children": [{
+"name": "and I would like to take Advance Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Annual Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (1, 2, 3)", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the Regular Rate", "children": [{
+"name": "with a daily maximum amount of $511", "children": [{
+"name": "or an aggregate maximum amount of $5,110", "children": [{
+"name": "or an aggregate maximum amount of $5,110"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (4 and 6)", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Regular Rates subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }]},{
+"name": "and I would like to take Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Advance Annual Leave", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }] }]},{
+"name": "and I would like to take EFMLEA which has Daily/Aggregate Dollar Limits and the first 80 hours at no cost to the employer but may be substituted", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Basic Rate subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }] }]},{
+"name": "and I am an Postal Regulatory Commission", "children": [{
+"name": "and I would like to take Advance Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Annual Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (1, 2, 3)", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the Regular Rate", "children": [{
+"name": "with a daily maximum amount of $511", "children": [{
+"name": "or an aggregate maximum amount of $5,110", "children": [{
+"name": "or an aggregate maximum amount of $5,110"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (4 and 6)", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Regular Rates subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }]},{
+"name": "and I would like to take Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Advance Annual Leave", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }] }]},{
+"name": "and I would like to take EFMLEA which has Daily/Aggregate Dollar Limits and the first 80 hours at no cost to the employer but may be substituted", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Basic Rate subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }] }]},{
+"name": "and I am an Legislative Branch", "children": [{
+"name": "and I would like to take Advance Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 240 hours", "children": [{
+"name": "calculated at the Prorated according to the number of hours in the employee's regularly scheduled administrative workweek.", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Annual Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (1, 2, 3)", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the EPSLA is not available.  Take regular leave.", "children": [{
+"name": "with a daily maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0", "children": [{
+"name": "or an aggregate maximum amount of $0"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the Regular Rate", "children": [{
+"name": "with a daily maximum amount of $511", "children": [{
+"name": "or an aggregate maximum amount of $5,110", "children": [{
+"name": "or an aggregate maximum amount of $5,110"}] }] }] }] }] }]},{
+"name": "and I would like to take EPSLA (4 and 6)", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Regular Rates subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }]},{
+"name": "and I would like to take Sick Leave for COVID-19", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of N/A"}] }] }] }] }] }]},{
+"name": "and I would like to take Advance Annual Leave", "children": [{
+"name": "After 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Before 04/01/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }]},{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is Employee Balance", "children": [{
+"name": "calculated at the Basic Rate", "children": [{
+"name": "with a daily maximum amount of N/A", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance", "children": [{
+"name": "or an aggregate maximum amount of Employee Balance"}] }] }] }] }] }]},{
+"name": "and I would like to take EFMLEA which has Daily/Aggregate Dollar Limits and the first 80 hours at no cost to the employer but may be substituted", "children": [{
+"name": "Between 04/01/2020 - 12/31/2020", "children": [{
+"name": "then my Leave Limit is 80 hours", "children": [{
+"name": "calculated at the 2/3 Basic Rate subject to Daily and Aggregate Limits", "children": [{
+"name": "with a daily maximum amount of $200", "children": [{
+"name": "or an aggregate maximum amount of $2,000", "children": [{
+"name": "or an aggregate maximum amount of $2,000"}] }] }] }] }] }] }] }]}]
+};
+    json.x0 = 0;
+    json.y0 = 0;
+    moveChildren(json);
+    update(root = json);
+
+
+    function update(source) {
+
+        // Compute the flattened node list. TODO use d3.layout.hierarchy.
+        var nodes = tree.nodes(root);
+
+        // Compute the "layout".
+        nodes.forEach(function(n, i) {
+            n.x = i * barHeight;
+        });
+
+        // Update the nodesÃ¢â‚¬Â¦
+        var node = vis.selectAll("g.node")
+            .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+        var nodeEnter = node.enter().append("svg:g")
+            .attr("class", "node")
+            .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+            .style("opacity", 1e-6);
+
+        // Enter any new nodes at the parent's previous position.
+        nodeEnter.append("svg:rect")
+            .attr("y", -barHeight / 2)
+            .attr("height", barHeight)
+            .attr("width", barWidth)
+            .attr("nodeType", nodeType)
+            .style("fill", color)
+            .on("click", click);
+
+        nodeEnter.append("svg:text")
+            .attr("dy", 3.5)
+            .attr("dx", 5.5)
+            .text(function(d) { return d.name; });
+
+        // Transition nodes to their new position.
+        nodeEnter.transition()
+            .duration(duration)
+            .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+            .style("opacity", 1);
+
+        node.transition()
+            .duration(duration)
+            .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+            .style("opacity", 1)
+            .select("rect")
+            .style("fill", color);
+
+        // Transition exiting nodes to the parent's new position.
+        node.exit().transition()
+            .duration(duration)
+            .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+            .style("opacity", 1e-6)
+            .remove();
+
+        // Update the linksÃ¢â‚¬Â¦
+        var link = vis.selectAll("path.link")
+            .data(tree.links(nodes), function(d) { return d.target.id; });
+
+        // Enter any new links at the parent's previous position.
+        link.enter().insert("svg:path", "g")
+            .attr("class", "link")
+            .attr("d", function(d) {
+                var o = { x: source.x0, y: source.y0 };
+                return diagonal({ source: o, target: o });
+            })
+            .transition()
+            .duration(duration)
+            .attr("d", diagonal);
+
+        // Transition links to their new position.
+        link.transition()
+            .duration(duration)
+            .attr("d", diagonal);
+
+        // Transition exiting nodes to the parent's new position.
+        link.exit().transition()
+            .duration(duration)
+            .attr("d", function(d) {
+                var o = { x: source.x, y: source.y };
+                return diagonal({ source: o, target: o });
+            })
+            .remove();
+
+        // Stash the old positions for transition.
+        nodes.forEach(function(d) {
+            d.x0 = d.x;
+            d.y0 = d.y;
+        });
+    }
+
+    // Toggle children on click.
+    function click(d) {
+        if (d.children) {
+            d._children = d.children;
+            d.children = null;
+        } else {
+            d.children = d._children;
+            d._children = null;
+        }
+        update(d);
+    }
+
+    function color(d) {
+        return d._children ? "white" : d.children ? "lightblue" : "#C0C0C0";
+    }
+
+    function nodeType(d) {
+        return d._children ? "parent" : d.children ? "parent" : "child";
+    }
+
+    function expand(d) {
+        var children = (d.children) ? d.children : d._children;
+        if (d._children) {
+            d.children = d._children;
+            d._children = null;
+        }
+        if (children)
+            children.forEach(expand);
+    }
+
+    function expandAll() {
+        expand(root);
+        update(root);
+    }
+
+    function collapseAll() {
+        root.children.forEach(collapse1);
+        collapse1(root);
+        update(root);
+    }
+
+    function collapse1(d) {
+        if (d.children) {
+            d._children = d.children;
+            d._children.forEach(collapse1);
+            d.children = null;
+        }
+    }
+    </script>
+</body>
+
+</html>
